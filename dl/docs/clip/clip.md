@@ -29,9 +29,9 @@ customization.
 ## 3. Methodology
 ### 3.1. Training Objective
 - **Contrastive Loss**: CLIP minimizes the **InfoNCE loss** (a contrastive loss) to align image and text embeddings. The objective is:
-  $$
+  \[
   \mathcal{L} = -\log \frac{\exp(\text{sim}(x_i, t_i)/\tau)}{\sum_{j=1}^N \exp(\text{sim}(x_i, t_j)/\tau)}
-  $$
+  \]
   where $x_i$ is an image, $t_i$ is the corresponding text, and $\tau$ is a temperature parameter.
 
 ### 3.2. Model Architecture
@@ -352,19 +352,19 @@ L --> M[**CLIPImageEmbedding**]
 - **[L2 Normalization](../../mlx-examples/clip/model.py#L323)**: Both text and image embeddings are `L2-normalized` to ensure the consistency of `cosine similarity`.
 
 - **[Loss Function](../../mlx-examples/clip/model.py#L76)**
-  - **InfoNCE loss**: The implemented `CLIP Loss` is the modified version of `InfoNCE Loss` for implementation efficiency and numerical stability by setting $\tau = exp(-\text{logit\_scale})$, which relaxes `logit_scale` to be free and guarantees the positivity of temperature parameter.
-    $$
+  - **InfoNCE loss**: The implemented `CLIP Loss` is the modified version of `InfoNCE Loss` for implementation efficiency and numerical stability by setting \(\tau = exp(-\text{logit\_scale})\), which relaxes `logit_scale` to be free and guarantees the positivity of temperature parameter.
+    \[
     \mathcal{L} = -\log \frac{\exp(\text{sim}(x_i, t_i)/  \tau)}{\sum_{j=1}^N \exp(\text{sim}(x_i, t_j)/\tau)}
-    $$
+    \]
 
   - **[Contrastive Loss (`clip_loss`)](../../mlx-examples/clip/model.py#L76)**: Computes logits as the dot product between text and image embeddings, scaled by `logit_scale`. The loss is computed using `cross-entropy`, treating each text-image pair as a positive example and all others as negatives.
 
   - **[Logit Scale](../../mlx-examples/clip/model.py#L340)**: `logit_scale` is a learnable parameter initialized to `0.0` (equivalent to `exp(0.0) = 1.0`), which controls the similarity magnitude.
-  $$
+  \[
   \begin{aligned}
     \text{Image Loss \ } \mathcal{L}_I &= -\log \frac{\exp(\text{sim}(T_i, I_i)*\tau)}{\sum_{j=1}^N \exp(\text{sim}(T_i, I_j)*\tau)} \\
     \text{Text Loss \ } \mathcal{L}_T &= -\log \frac{\exp(\text{sim}(T_i, I_i)*\tau)}{\sum_{j=1}^N \exp(\text{sim}(T_j, I_i)*\tau)} \\
     \text{CLIP Loss \ } \mathcal{L} &= (\mathcal{L}_I + \mathcal{L}_T) / 2 \\
     \text{Temperature \ } \tau &= exp(\text{logit\_scale})
   \end{aligned}
-  $$
+  \]
